@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Twitch-Xposed</string>
+    <string name="module_description">useful features for twitch</string>
 </resources>
