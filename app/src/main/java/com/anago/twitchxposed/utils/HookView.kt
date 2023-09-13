@@ -1,5 +1,7 @@
 package com.anago.twitchxposed.utils
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.view.View
 import de.robv.android.xposed.XposedHelpers
 
@@ -18,5 +20,23 @@ object HookView {
             }
         }
         return result
+    }
+
+    @SuppressLint("DiscouragedApi")
+    fun getLayoutId(
+        context: Context,
+        name: String,
+        packageName: String = context.packageName
+    ): Int {
+        return context.resources.getIdentifier(name, "layout", packageName)
+    }
+
+    @SuppressLint("DiscouragedApi")
+    fun getViewId(
+        context: Context,
+        name: String,
+        packageName: String = context.packageName
+    ): Int {
+        return context.resources.getIdentifier(name, "id", packageName)
     }
 }
