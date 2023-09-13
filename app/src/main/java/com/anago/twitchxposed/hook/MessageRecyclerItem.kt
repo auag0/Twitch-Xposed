@@ -1,5 +1,6 @@
 package com.anago.twitchxposed.hook
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.text.SpannableStringBuilder
@@ -36,12 +37,13 @@ class MessageRecyclerItem : BaseHook() {
 
         XposedBridge.hookAllConstructors(clazz, object : XC_MethodHook() {
             override fun beforeHookedMethod(param: MethodHookParam) {
-                param.args[6] = addEmotes(param.args[6] as Spanned)
+                val context = param.args[0] as Context
+                param.args[6] = addEmotes(context, param.args[6] as Spanned)
             }
         })
     }
 
-    private fun addEmotes(spanned: Spanned): Spanned {
+    private fun addEmotes(context: Context, spanned: Spanned): Spanned {
         val userNameEnd = spanned.indexOf(": ")
         if (userNameEnd == -1) {
             return spanned
@@ -60,7 +62,8 @@ class MessageRecyclerItem : BaseHook() {
                 if (emote != null) {
                     val start = matchResult.range.first
                     val end = matchResult.range.last + 1
-                    builder[start, end] = createCenteredImageSpan(emote.url, Color.TRANSPARENT)
+                    builder[start, end] =
+                        createCenteredImageSpan(emote.getUrl(context), Color.TRANSPARENT)
                 }
             }
 

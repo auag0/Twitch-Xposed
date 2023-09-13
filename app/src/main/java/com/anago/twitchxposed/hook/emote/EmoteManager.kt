@@ -1,5 +1,6 @@
 package com.anago.twitchxposed.hook.emote
 
+import android.content.Context
 import com.anago.twitchxposed.utils.Logger.logD
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -57,9 +58,9 @@ object EmoteManager {
         val id: String,
         val code: String
     ) {
-        val url: String
-            get() {
-                return "https://cdn.betterttv.net/emote/${id}/1x.png"
-            }
+        fun getUrl(context: Context): String {
+            val size = if (context.resources.displayMetrics.density > 2.0f) "3x" else "2x"
+            return "https://cdn.betterttv.net/emote/${id}/${size}"
+        }
     }
 }
