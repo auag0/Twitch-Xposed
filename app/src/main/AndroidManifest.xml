@@ -13,5 +13,8 @@
         <meta-data
             android:name="xposedminversion"
             android:value="93" />
+        <meta-data
+            android:name="xposedscope"
+            android:value="tv.twitch.android.app" />
     </application>
 </manifest>
