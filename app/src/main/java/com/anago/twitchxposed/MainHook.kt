@@ -2,6 +2,8 @@ package com.anago.twitchxposed
 
 import com.anago.twitchxposed.hook.ChatUtil
 import com.anago.twitchxposed.hook.CommunityPointsButtonViewDelegate
+import com.anago.twitchxposed.hook.MessageRecyclerItem
+import com.anago.twitchxposed.hook.TwitchApplication
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 
@@ -16,8 +18,9 @@ class MainHook : IXposedHookLoadPackage {
     }
 
     private fun startHook(classLoader: ClassLoader) {
+        TwitchApplication().hook(classLoader)
         CommunityPointsButtonViewDelegate().hook(classLoader)
-
         ChatUtil().hook(classLoader)
+        MessageRecyclerItem().hook(classLoader)
     }
 }
