@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
+import com.anago.twitchxposed.dialog.ModSettingsDialog
 import com.anago.twitchxposed.hook.base.BaseHook
 import com.anago.twitchxposed.utils.xposed.FieldUtils.getField
 import com.anago.twitchxposed.utils.xposed.ViewUtils.getLayoutId
@@ -64,7 +64,7 @@ class SettingsMenuViewDelegate(private val classLoader: ClassLoader) : BaseHook(
                 accountSettingsContainer.addView(menuGroupView)
 
                 menuGroupView.setOnClickListener {
-                    Toast.makeText(context, "coming soon...", Toast.LENGTH_SHORT).show()
+                    ModSettingsDialog(context).show()
                 }
             }
         })

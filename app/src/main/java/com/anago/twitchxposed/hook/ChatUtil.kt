@@ -7,6 +7,8 @@ import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import com.anago.twitchxposed.hook.base.BaseHook
+import com.anago.twitchxposed.pref.PRefs
+import com.anago.twitchxposed.utils.xposed.MethodUtils.invokeOriginalMethod
 import de.robv.android.xposed.XC_MethodReplacement
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
@@ -24,7 +26,10 @@ class ChatUtil(private val classLoader: ClassLoader) : BaseHook(classLoader) {
             clazz,
             "createDeletedSpanFromChatMessageSpan",
             object : XC_MethodReplacement() {
-                override fun replaceHookedMethod(param: MethodHookParam): Spanned {
+                override fun replaceHookedMethod(param: MethodHookParam): Any {
+                    if (!PRefs.enablePreventMessages) {
+                        return param.invokeOriginalMethod()!!
+                    }
                     val origMessage = param.args[1] as Spanned
                     val deletedText = "(DELETED)"
                     val userNameEndIndex = origMessage.lastIndexOf(": ")

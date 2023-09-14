@@ -2,6 +2,7 @@ package com.anago.twitchxposed.hook
 
 import android.view.ViewGroup
 import com.anago.twitchxposed.hook.base.BaseHook
+import com.anago.twitchxposed.pref.PRefs
 import com.anago.twitchxposed.utils.Logger.logD
 import com.anago.twitchxposed.utils.xposed.FieldUtils.getField
 import de.robv.android.xposed.XC_MethodHook
@@ -21,9 +22,11 @@ class CommunityPointsButtonViewDelegate(private val classLoader: ClassLoader) :
     override fun hook() {
         XposedBridge.hookAllMethods(clazz, "showClaimAvailable", object : XC_MethodHook() {
             override fun afterHookedMethod(param: MethodHookParam) {
-                val buttonLayout = param.thisObject.getField<ViewGroup>("buttonLayout")
-                buttonLayout.callOnClick()
-                logD("Claim Clicked")
+                if (PRefs.enableAutoClaimPoints) {
+                    val buttonLayout = param.thisObject.getField<ViewGroup>("buttonLayout")
+                    buttonLayout.callOnClick()
+                    logD("Claim Clicked")
+                }
             }
         })
     }
