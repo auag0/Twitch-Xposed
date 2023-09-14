@@ -3,7 +3,7 @@ package com.anago.twitchxposed.utils.xposed
 import android.annotation.SuppressLint
 import android.content.Context
 
-object View {
+object ViewUtils {
     @SuppressLint("DiscouragedApi")
     fun getLayoutId(
         context: Context,

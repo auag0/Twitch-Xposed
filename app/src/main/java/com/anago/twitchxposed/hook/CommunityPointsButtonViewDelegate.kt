@@ -2,7 +2,7 @@ package com.anago.twitchxposed.hook
 
 import android.view.ViewGroup
 import com.anago.twitchxposed.utils.Logger.logD
-import com.anago.twitchxposed.utils.xposed.Field.getField
+import com.anago.twitchxposed.utils.xposed.FieldUtils.getField
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers

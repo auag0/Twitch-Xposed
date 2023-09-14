@@ -2,7 +2,7 @@ package com.anago.twitchxposed.utils.xposed
 
 import de.robv.android.xposed.XposedHelpers
 
-object Field {
+object FieldUtils {
     @Suppress("UNCHECKED_CAST")
     fun <T> Any.getField(fieldName: String): T {
         try {

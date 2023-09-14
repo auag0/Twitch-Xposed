@@ -8,7 +8,7 @@ import android.text.Spanned
 import androidx.core.text.set
 import com.anago.twitchxposed.hook.emote.EmoteManager
 import com.anago.twitchxposed.utils.Logger.logE
-import com.anago.twitchxposed.utils.xposed.Field.getStaticField
+import com.anago.twitchxposed.utils.xposed.FieldUtils.getStaticField
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
