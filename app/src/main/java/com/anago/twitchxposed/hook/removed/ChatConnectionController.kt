@@ -1,13 +1,14 @@
+/*
 package com.anago.twitchxposed.hook.removed
 
-import com.anago.twitchxposed.hook.BaseHook
+import com.anago.twitchxposed.hook.base.BaseHook
 import de.robv.android.xposed.XC_MethodReplacement
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 
 
-class ChatConnectionController : BaseHook() {
-    override fun hook(classLoader: ClassLoader) {
+class ChatConnectionController(private val classLoader: ClassLoader) : BaseHook(classLoader) {
+    override fun hook() {
         val clazz = XposedHelpers.findClass(
             "tv.twitch.android.shared.chat.observables.ChatConnectionController",
             classLoader
@@ -40,4 +41,4 @@ class ChatConnectionController : BaseHook() {
                 }
             })
     }
-}
+}*/

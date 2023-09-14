@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import androidx.core.text.set
+import com.anago.twitchxposed.hook.base.BaseHook
 import com.anago.twitchxposed.hook.emote.EmoteManager
 import com.anago.twitchxposed.utils.Logger.logE
 import com.anago.twitchxposed.utils.xposed.FieldUtils.getStaticField
@@ -13,29 +14,33 @@ import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 
-class MessageRecyclerItem : BaseHook() {
-
-    private lateinit var classMediaSpan: Class<*>
-    private lateinit var classUrlDrawable: Class<*>
-    private lateinit var classCenteredImageSpan: Class<*>
-    override fun hook(classLoader: ClassLoader) {
-        val clazz = XposedHelpers.findClass(
+class MessageRecyclerItem(private val classLoader: ClassLoader) : BaseHook(classLoader) {
+    private val clazz by lazy {
+        XposedHelpers.findClass(
             "tv.twitch.android.shared.chat.adapter.item.MessageRecyclerItem",
             classLoader
         )
-        classMediaSpan = XposedHelpers.findClass(
+    }
+    private val classMediaSpan by lazy {
+        XposedHelpers.findClass(
             "tv.twitch.android.shared.ui.elements.span.MediaSpan\$Type",
             classLoader
         )
-        classUrlDrawable = XposedHelpers.findClass(
+    }
+    private val classUrlDrawable by lazy {
+        XposedHelpers.findClass(
             "tv.twitch.android.shared.ui.elements.span.UrlDrawable",
             classLoader
         )
-        classCenteredImageSpan = XposedHelpers.findClass(
+    }
+    private val classCenteredImageSpan by lazy {
+        XposedHelpers.findClass(
             "tv.twitch.android.shared.ui.elements.span.CenteredImageSpan",
             classLoader
         )
+    }
 
+    override fun hook() {
         XposedBridge.hookAllConstructors(clazz, object : XC_MethodHook() {
             override fun beforeHookedMethod(param: MethodHookParam) {
                 val context = param.args[0] as Context

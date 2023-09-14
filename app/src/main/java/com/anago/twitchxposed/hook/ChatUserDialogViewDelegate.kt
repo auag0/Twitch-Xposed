@@ -16,6 +16,7 @@ import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import com.anago.twitchxposed.MainHook.Companion.modResource
 import com.anago.twitchxposed.R
+import com.anago.twitchxposed.hook.base.BaseHook
 import com.anago.twitchxposed.utils.DateUtils.toFormattedDate
 import com.anago.twitchxposed.utils.StringUtils.textCopy
 import com.anago.twitchxposed.utils.UrlUtils.openWebPage
@@ -25,13 +26,15 @@ import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 
-class ChatUserDialogViewDelegate : BaseHook() {
-    override fun hook(classLoader: ClassLoader) {
-        val clazz = XposedHelpers.findClass(
+class ChatUserDialogViewDelegate(private val classLoader: ClassLoader) : BaseHook(classLoader) {
+    private val clazz by lazy {
+        XposedHelpers.findClass(
             "tv.twitch.android.shared.chat.chatuserdialog.ChatUserDialogViewDelegate",
             classLoader
         )
+    }
 
+    override fun hook() {
         XposedBridge.hookAllMethods(clazz, "bind", object : XC_MethodHook() {
             override fun afterHookedMethod(param: MethodHookParam) {
                 val context = param.thisObject.getField<Context>("context")

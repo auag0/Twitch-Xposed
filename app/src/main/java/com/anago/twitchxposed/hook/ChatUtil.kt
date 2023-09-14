@@ -6,17 +6,20 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
+import com.anago.twitchxposed.hook.base.BaseHook
 import de.robv.android.xposed.XC_MethodReplacement
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 
-class ChatUtil : BaseHook() {
-    override fun hook(classLoader: ClassLoader) {
-        val clazz = XposedHelpers.findClass(
+class ChatUtil(private val classLoader: ClassLoader) : BaseHook(classLoader) {
+    private val clazz by lazy {
+        XposedHelpers.findClass(
             "tv.twitch.android.shared.chat.util.ChatUtil\$Companion",
             classLoader
         )
+    }
 
+    override fun hook() {
         XposedBridge.hookAllMethods(
             clazz,
             "createDeletedSpanFromChatMessageSpan",

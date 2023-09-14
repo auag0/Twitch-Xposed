@@ -1,13 +1,14 @@
+/*
 package com.anago.twitchxposed.hook.removed
 
-import com.anago.twitchxposed.hook.BaseHook
+import com.anago.twitchxposed.hook.base.BaseHook
 import com.anago.twitchxposed.utils.Logger.logD
 import de.robv.android.xposed.XC_MethodReplacement
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 
-class ChatChannelListener : BaseHook() {
-    override fun hook(classLoader: ClassLoader) {
+class ChatChannelListener(private val classLoader: ClassLoader) : BaseHook(classLoader) {
+    override fun hook() {
         val clazz = XposedHelpers.findClass(
             "tv.twitch.android.sdk.ChatController\$ChatChannelListener",
             classLoader
@@ -43,4 +44,4 @@ class ChatChannelListener : BaseHook() {
                 }
             })
     }
-}
+}*/

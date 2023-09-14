@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import com.anago.twitchxposed.hook.base.BaseHook
 import com.anago.twitchxposed.utils.xposed.FieldUtils.getField
 import com.anago.twitchxposed.utils.xposed.ViewUtils.getLayoutId
 import com.anago.twitchxposed.utils.xposed.ViewUtils.getViewId
@@ -15,8 +16,8 @@ import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 
-class SettingsMenuViewDelegate : BaseHook() {
-    override fun hook(classLoader: ClassLoader) {
+class SettingsMenuViewDelegate(private val classLoader: ClassLoader) : BaseHook(classLoader) {
+    override fun hook() {
         val clazz = XposedHelpers.findClass(
             "tv.twitch.android.feature.settings.menu.SettingsMenuViewDelegate",
             classLoader
