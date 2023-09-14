@@ -1,5 +1,6 @@
 package com.anago.twitchxposed
 
+import com.anago.twitchxposed.hook.ChatUserDialogViewDelegate
 import com.anago.twitchxposed.hook.ChatUtil
 import com.anago.twitchxposed.hook.CommunityPointsButtonViewDelegate
 import com.anago.twitchxposed.hook.MessageRecyclerItem
@@ -24,5 +25,6 @@ class MainHook : IXposedHookLoadPackage {
         ChatUtil().hook(classLoader)
         MessageRecyclerItem().hook(classLoader)
         SettingsMenuViewDelegate().hook(classLoader)
+        ChatUserDialogViewDelegate().hook(classLoader)
     }
 }

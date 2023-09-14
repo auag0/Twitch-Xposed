@@ -8,8 +8,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import com.anago.twitchxposed.utils.HookView.getLayoutId
-import com.anago.twitchxposed.utils.HookView.getViewId
+import com.anago.twitchxposed.utils.xposed.Field.getField
+import com.anago.twitchxposed.utils.xposed.View.getLayoutId
+import com.anago.twitchxposed.utils.xposed.View.getViewId
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
@@ -26,10 +27,9 @@ class SettingsMenuViewDelegate : BaseHook() {
             override fun afterHookedMethod(param: MethodHookParam) {
                 super.afterHookedMethod(param)
 
-                val accountSettingsContainer = XposedHelpers.getObjectField(
-                    param.thisObject,
+                val accountSettingsContainer = param.thisObject.getField<ViewGroup>(
                     "accountSettingsContainer"
-                ) as ViewGroup
+                )
 
                 if (accountSettingsContainer.findViewWithTag<View?>("added") != null) {
                     return

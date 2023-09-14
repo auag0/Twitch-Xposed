@@ -8,6 +8,7 @@ import android.text.Spanned
 import androidx.core.text.set
 import com.anago.twitchxposed.hook.emote.EmoteManager
 import com.anago.twitchxposed.utils.Logger.logE
+import com.anago.twitchxposed.utils.xposed.Field.getStaticField
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
@@ -77,7 +78,7 @@ class MessageRecyclerItem : BaseHook() {
     }
 
     private fun createMediaSpan(): Any {
-        return XposedHelpers.getStaticObjectField(classMediaSpan, "Emote")
+        return classMediaSpan.getStaticField("Emote")
     }
 
     private fun createUrlDrawable(
