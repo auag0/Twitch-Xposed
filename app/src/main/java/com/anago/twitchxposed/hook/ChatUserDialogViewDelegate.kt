@@ -17,6 +17,7 @@ import androidx.core.content.res.ResourcesCompat
 import com.anago.twitchxposed.MainHook.Companion.modResource
 import com.anago.twitchxposed.R
 import com.anago.twitchxposed.hook.base.BaseHook
+import com.anago.twitchxposed.utils.DateUtils.calculateDaysDiff
 import com.anago.twitchxposed.utils.DateUtils.toFormattedDate
 import com.anago.twitchxposed.utils.StringUtils.textCopy
 import com.anago.twitchxposed.utils.UrlUtils.openWebPage
@@ -111,11 +112,16 @@ class ChatUserDialogViewDelegate(private val classLoader: ClassLoader) : BaseHoo
         val displayName: String = chatUser.getField("displayName")
         val username: String = chatUser.getField("username")
         val formattedDate = createDateMillis.toFormattedDate("yyyy-MM-dd")
+        val daysAgo = "${calculateDaysDiff(createDateMillis, System.currentTimeMillis())} days ago"
 
         val linearLayout = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             addView(createDetailItem(
-                context, this, R.drawable.ic_cake, "Account Creation Date", formattedDate
+                context,
+                this,
+                R.drawable.ic_cake,
+                "Account Creation Date",
+                "$formattedDate $daysAgo"
             ) {
                 textCopy(context, formattedDate)
             })

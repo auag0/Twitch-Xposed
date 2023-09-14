@@ -37,11 +37,11 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, IXposedHookInitP
     }
 
     private fun startHook(classLoader: ClassLoader) {
-        TwitchApplication().hook(classLoader)
-        CommunityPointsButtonViewDelegate().hook(classLoader)
-        ChatUtil().hook(classLoader)
-        MessageRecyclerItem().hook(classLoader)
-        SettingsMenuViewDelegate().hook(classLoader)
-        ChatUserDialogViewDelegate().hook(classLoader)
+        TwitchApplication(classLoader).hook()
+        CommunityPointsButtonViewDelegate(classLoader).hook()
+        ChatUtil(classLoader).hook()
+        MessageRecyclerItem(classLoader).hook()
+        SettingsMenuViewDelegate(classLoader).hook()
+        ChatUserDialogViewDelegate(classLoader).hook()
     }
 }
