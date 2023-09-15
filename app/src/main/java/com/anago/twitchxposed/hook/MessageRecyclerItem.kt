@@ -62,7 +62,10 @@ class MessageRecyclerItem(private val classLoader: ClassLoader) : BaseHook(class
                 if (!enableMessageLogs) {
                     return
                 }
-                val messageId = param.args[1] as String
+                val messageId = param.args[1] as? String?
+                if (messageId.isNullOrBlank()) {
+                    return
+                }
                 val userId = param.args[2] as Int
                 val username = param.args[3] as String
                 val displayName = param.args[4] as String
