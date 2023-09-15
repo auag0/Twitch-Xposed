@@ -5,6 +5,7 @@ import com.anago.twitchxposed.hook.ChatUserDialogViewDelegate
 import com.anago.twitchxposed.hook.ChatUtil
 import com.anago.twitchxposed.hook.CommunityPointsButtonViewDelegate
 import com.anago.twitchxposed.hook.MessageRecyclerItem
+import com.anago.twitchxposed.hook.NewProfileCardViewDelegate
 import com.anago.twitchxposed.hook.SettingsMenuViewDelegate
 import com.anago.twitchxposed.hook.TwitchApplication
 import de.robv.android.xposed.IXposedHookInitPackageResources
@@ -43,5 +44,6 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, IXposedHookInitP
         MessageRecyclerItem(classLoader).hook()
         SettingsMenuViewDelegate(classLoader).hook()
         ChatUserDialogViewDelegate(classLoader).hook()
+        NewProfileCardViewDelegate(classLoader).hook()
     }
 }
