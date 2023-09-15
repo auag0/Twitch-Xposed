@@ -19,6 +19,7 @@ object PRefs {
 
     var enableAutoClaimPoints by Pref("bool_auto_claim_point", true)
     var enablePreventMessages by Pref("bool_prevent_messages", true)
+    var enableMessageLogs by Pref("bool_message_logs", true)
 
     class Pref<T>(private val key: String, private val defValue: T) : ReadWriteProperty<Any, T> {
         @Suppress("UNCHECKED_CAST")

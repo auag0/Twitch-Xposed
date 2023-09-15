@@ -10,6 +10,7 @@ import com.anago.twitchxposed.database.AppDatabase.Companion.getDB
 import com.anago.twitchxposed.database.entity.UserChatMessage
 import com.anago.twitchxposed.hook.base.BaseHook
 import com.anago.twitchxposed.hook.emote.EmoteManager
+import com.anago.twitchxposed.pref.PRefs.enableMessageLogs
 import com.anago.twitchxposed.utils.Logger.logE
 import com.anago.twitchxposed.utils.xposed.FieldUtils.getStaticField
 import de.robv.android.xposed.XC_MethodHook
@@ -56,6 +57,9 @@ class MessageRecyclerItem(private val classLoader: ClassLoader) : BaseHook(class
 
             override fun afterHookedMethod(param: MethodHookParam) {
                 if (param.args.size != 16) {
+                    return
+                }
+                if (!enableMessageLogs) {
                     return
                 }
                 val messageId = param.args[1] as String

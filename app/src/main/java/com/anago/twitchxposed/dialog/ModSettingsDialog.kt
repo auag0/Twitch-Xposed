@@ -9,14 +9,23 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Switch
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import com.anago.twitchxposed.MainHook.Companion.modResource
 import com.anago.twitchxposed.R
+import com.anago.twitchxposed.database.AppDatabase.Companion.getDB
 import com.anago.twitchxposed.pref.PRefs.enableAutoClaimPoints
+import com.anago.twitchxposed.pref.PRefs.enableMessageLogs
 import com.anago.twitchxposed.pref.PRefs.enablePreventMessages
 import com.anago.twitchxposed.utils.ViewUtils.layoutInflater
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ModSettingsDialog(private val context: Context) {
+    @OptIn(DelicateCoroutinesApi::class)
     fun show() {
         val settingsLayoutId = modResource.getLayout(R.layout.dialog_mod_settings)
         val settingsLayout = context.layoutInflater.inflate(
@@ -72,6 +81,59 @@ class ModSettingsDialog(private val context: Context) {
 
         settingsLayout.addView(
             createItem(
+                "Message Logs",
+                R.drawable.ic_chat,
+                "Enable save messages",
+                useSwitch = true,
+                isCheckedd = enableMessageLogs,
+                onClick = null,
+                onCheck = { isChecked ->
+                    enableMessageLogs = isChecked
+                },
+                isHeader = false
+            )
+        )
+
+        settingsLayout.addView(
+            createItem(
+                "Delete all Saved message Logs",
+                R.drawable.ic_delete,
+                "loading..",
+                useSwitch = false,
+                isCheckedd = false,
+                onClick = {
+                    AlertDialog.Builder(context).apply {
+                        setTitle("Confirm")
+                        setPositiveButton("delete") { _, _ ->
+                            GlobalScope.launch(Dispatchers.IO) {
+                                getDB().userChatMessageDao().deleteAllMessageLogs()
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+                                    findViewById<TextView>(R.id.description).apply {
+                                        text = "0 logs"
+                                    }
+                                }
+                            }
+                        }
+                    }.show()
+                },
+                onCheck = null,
+                isHeader = false,
+                func = {
+                    GlobalScope.launch(Dispatchers.IO) {
+                        val count = getDB().userChatMessageDao().getAllMessageCount()
+                        withContext(Dispatchers.Main) {
+                            findViewById<TextView>(R.id.description).apply {
+                                text = "$count logs"
+                            }
+                        }
+                    }
+                }
+            )
+        )
+
+        settingsLayout.addView(
+            createItem(
                 "Account",
                 0,
                 null,
@@ -114,9 +176,10 @@ class ModSettingsDialog(private val context: Context) {
         description: String? = null,
         useSwitch: Boolean = false,
         isCheckedd: Boolean = false,
-        onCheck: ((isChecked: Boolean) -> Unit)?,
-        onClick: (View.() -> Unit)?,
-        isHeader: Boolean
+        onCheck: ((isChecked: Boolean) -> Unit)? = null,
+        onClick: (View.() -> Unit)? = null,
+        isHeader: Boolean = false,
+        func: (View.() -> Unit)? = null
     ): View {
         val itemLayoutId = modResource.getLayout(R.layout.settings_item)
         val settingsLayout = context.layoutInflater.inflate(itemLayoutId, null, false)
@@ -160,6 +223,8 @@ class ModSettingsDialog(private val context: Context) {
                 onClick.invoke(it)
             }
         }
+
+        func?.invoke(settingsLayout)
 
         return settingsLayout
     }

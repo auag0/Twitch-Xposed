@@ -13,4 +13,10 @@ interface UserChatMessageDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertMessage(message: UserChatMessage)
+
+    @Query("SELECT COUNT(*) FROM userchatmessage")
+    fun getAllMessageCount(): Int
+
+    @Query("DELETE FROM userchatmessage")
+    suspend fun deleteAllMessageLogs()
 }
