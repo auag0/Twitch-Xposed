@@ -1,13 +1,17 @@
 package com.anago.twitchxposed.hook.emote
 
-import com.anago.twitchxposed.hook.emote.model.Emote
+import com.anago.twitchxposed.database.AppDatabase.Companion.getDB
+import com.anago.twitchxposed.database.entity.Emote
+import com.anago.twitchxposed.pref.PRefs.lastEmoteCacheTime
 import com.anago.twitchxposed.utils.Logger.logD
 import com.anago.twitchxposed.utils.Logger.logE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
+import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.concurrent.TimeUnit
 
 object EmoteManager {
     private val loadedEmotes: ArrayList<Emote> = ArrayList()
@@ -18,52 +22,73 @@ object EmoteManager {
 
     suspend fun fetchAllEmotes() {
         loadedEmotes.clear()
-        fetchBTTVEmotes()
-        fetchSevenTVEmotes()
-        fetchFFZEmotes()
-        logD("${loadedEmotes.size} loaded emotes")
+
+        if (System.currentTimeMillis() - lastEmoteCacheTime > TimeUnit.MINUTES.toMillis(15)) {
+            logD("fetch emotes from network")
+            val bttvEmotes = fetchBTTVEmotes()
+            val sevenTVEmotes = fetchSevenTVEmotes()
+            val ffzEmotes = fetchFFZEmotes()
+
+            loadedEmotes.addAll(bttvEmotes)
+            loadedEmotes.addAll(sevenTVEmotes)
+            loadedEmotes.addAll(ffzEmotes)
+
+            getDB().cachedEmoteDao().deleteAllEmotes()
+            getDB().cachedEmoteDao().insertEmotes(loadedEmotes)
+            lastEmoteCacheTime = System.currentTimeMillis()
+        } else {
+            logD("fetch emotes from database")
+            val emotes = getDB().cachedEmoteDao().getAllCachedEmote()
+            loadedEmotes.addAll(emotes)
+        }
+
+        logD("${loadedEmotes.size} loaded all emotes")
     }
 
-    private suspend fun fetchBTTVEmotes() {
+    private suspend fun fetchBTTVEmotes(): List<Emote> {
         val response = fetch("https://api.betterttv.net/3/cached/emotes/global")
-        val jsonArray = JSONArray(response)
-        for (i in 0 until jsonArray.length()) {
-            val item = jsonArray.getJSONObject(i)
+        return parseEmotes(response) { item ->
             val id = item.getString("id")
-            val emote = Emote(
+            Emote(
                 code = item.getString("code"),
                 url = "https://cdn.betterttv.net/emote/${id}/2x"
             )
-            loadedEmotes.add(emote)
         }
     }
 
-    private suspend fun fetchSevenTVEmotes() {
+    private suspend fun fetchSevenTVEmotes(): List<Emote> {
         val response = fetch("https://api.7tv.app/v2/emotes/global")
-        val jsonArray = JSONArray(response)
-        for (i in 0 until jsonArray.length()) {
-            val item = jsonArray.getJSONObject(i)
+        return parseEmotes(response) { item ->
             val id = item.getString("id")
-            val emote = Emote(
+            Emote(
                 code = item.getString("name"),
                 url = "https://cdn.7tv.app/emote/${id}/2x.webp"
             )
-            loadedEmotes.add(emote)
         }
     }
 
-    private suspend fun fetchFFZEmotes() {
+    private suspend fun fetchFFZEmotes(): List<Emote> {
         val response = fetch("https://api.betterttv.net/3/cached/frankerfacez/emotes/global")
-        val jsonArray = JSONArray(response)
-        for (i in 0 until jsonArray.length()) {
-            val item = jsonArray.getJSONObject(i)
+        return parseEmotes(response) { item ->
             val id = item.getString("id")
-            val emote = Emote(
+            Emote(
                 code = item.getString("code"),
                 url = "https://cdn.betterttv.net/frankerfacez_emote/${id}/2"
             )
-            loadedEmotes.add(emote)
         }
+    }
+
+    private fun parseEmotes(response: String?, parse: (JSONObject) -> Emote): List<Emote> {
+        val emotes = ArrayList<Emote>()
+        if (!response.isNullOrBlank()) {
+            val jsonArray = JSONArray(response)
+            for (i in 0 until jsonArray.length()) {
+                val item = jsonArray.getJSONObject(i)
+                val emote = parse(item)
+                emotes.add(emote)
+            }
+        }
+        return emotes
     }
 
     private suspend fun fetch(url: String): String? = withContext(Dispatchers.IO) {

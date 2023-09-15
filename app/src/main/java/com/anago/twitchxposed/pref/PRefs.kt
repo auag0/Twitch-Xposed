@@ -21,6 +21,7 @@ object PRefs {
     var enablePreventMessages by Pref("bool_prevent_messages", true)
     var enableMessageLogs by Pref("bool_message_logs", true)
 
+    var lastEmoteCacheTime by Pref("last_emote_cache_time", 0L)
     class Pref<T>(private val key: String, private val defValue: T) : ReadWriteProperty<Any, T> {
         @Suppress("UNCHECKED_CAST")
         override fun getValue(thisRef: Any, property: KProperty<*>): T {

@@ -1,7 +1,6 @@
 package com.anago.twitchxposed.hook
 
 import android.app.Application
-import com.anago.twitchxposed.database.AppDatabase.Companion.setupDatabase
 import com.anago.twitchxposed.hook.base.BaseHook
 import com.anago.twitchxposed.hook.emote.EmoteManager
 import com.anago.twitchxposed.pref.PRefs.setupPrefs
@@ -21,13 +20,21 @@ class TwitchApplication(private val classLoader: ClassLoader) : BaseHook(classLo
         )
     }
 
+    companion object {
+        private lateinit var app: Application
+
+        fun getApp(): Application {
+            return app
+        }
+    }
+
     @OptIn(DelicateCoroutinesApi::class)
     override fun hook() {
         XposedBridge.hookAllMethods(clazz, "onCreate", object : XC_MethodHook() {
             override fun beforeHookedMethod(param: MethodHookParam) {
                 val application = param.thisObject as Application
+                app = application
                 setupPrefs(application)
-                setupDatabase(application)
             }
             override fun afterHookedMethod(param: MethodHookParam) {
                 GlobalScope.launch(Dispatchers.IO) {
