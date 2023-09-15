@@ -2,6 +2,8 @@ package com.anago.twitchxposed.dialog
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -30,6 +32,18 @@ class ModSettingsDialog(private val context: Context) {
             setView(settingsLayout)
         }.show()
 
+        settingsLayout.addView(
+            createItem(
+                "Settings",
+                0,
+                null,
+                useSwitch = false,
+                onClick = null,
+                onCheck = null,
+                isHeader = true
+            )
+        )
+
         settingsLayout.addView(createItem(
             "Auto Claim Points",
             R.drawable.ic_currency_exchange,
@@ -39,7 +53,8 @@ class ModSettingsDialog(private val context: Context) {
             onClick = null,
             onCheck = { isChecked ->
                 enableAutoClaimPoints = isChecked
-            }
+            },
+            isHeader = false
         ))
 
         settingsLayout.addView(createItem(
@@ -51,8 +66,46 @@ class ModSettingsDialog(private val context: Context) {
             onClick = null,
             onCheck = { isChecked ->
                 enablePreventMessages = isChecked
-            }
+            },
+            isHeader = false
         ))
+
+        settingsLayout.addView(
+            createItem(
+                "Account",
+                0,
+                null,
+                useSwitch = false,
+                onClick = null,
+                onCheck = null,
+                isHeader = true
+            )
+        )
+
+        val sp = context.getSharedPreferences("user", MODE_PRIVATE)
+
+        settingsLayout.addView(
+            createItem(
+                "Your AuthToken",
+                R.drawable.ic_key,
+                "click to show",
+                useSwitch = false,
+                onClick = {
+                    val authToken: String? = sp.getString("authToken_v2", null)
+                    findViewById<TextView>(R.id.description).apply {
+                        if (authToken.isNullOrBlank()) {
+                            text = "not found."
+                            setTextIsSelectable(false)
+                        } else {
+                            text = authToken
+                            setTextIsSelectable(true)
+                        }
+                    }
+                },
+                onCheck = null,
+                isHeader = false
+            )
+        )
     }
 
     private fun createItem(
@@ -62,13 +115,18 @@ class ModSettingsDialog(private val context: Context) {
         useSwitch: Boolean = false,
         isCheckedd: Boolean = false,
         onCheck: ((isChecked: Boolean) -> Unit)?,
-        onClick: (() -> Unit)?
+        onClick: (View.() -> Unit)?,
+        isHeader: Boolean
     ): View {
         val itemLayoutId = modResource.getLayout(R.layout.settings_item)
         val settingsLayout = context.layoutInflater.inflate(itemLayoutId, null, false)
 
         settingsLayout.findViewById<TextView>(R.id.title).apply {
             text = title
+            if (isHeader) {
+                gravity = Gravity.CENTER
+                textSize = 18f
+            }
         }
 
         settingsLayout.findViewById<ImageView>(R.id.icon).apply {
@@ -80,7 +138,11 @@ class ModSettingsDialog(private val context: Context) {
         }
 
         settingsLayout.findViewById<TextView>(R.id.description).apply {
-            text = description
+            if (description == null) {
+                visibility = View.GONE
+            } else {
+                text = description
+            }
         }
 
         settingsLayout.findViewById<Switch>(R.id.switchh).apply {
@@ -95,7 +157,7 @@ class ModSettingsDialog(private val context: Context) {
 
         if (onClick != null) {
             settingsLayout.setOnClickListener {
-                onClick.invoke()
+                onClick.invoke(it)
             }
         }
 
