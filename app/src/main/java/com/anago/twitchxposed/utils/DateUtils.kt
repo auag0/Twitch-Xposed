@@ -7,9 +7,13 @@ import java.util.concurrent.TimeUnit
 
 object DateUtils {
     /** yyyy-MM-dd HH:mm:ss **/
-    fun Long.toFormattedDate(dateFormat: String): String {
+    fun Long.millisToFormattedDate(dateFormat: String): String {
         val simpleDateFormat = SimpleDateFormat(dateFormat, Locale.getDefault())
         return simpleDateFormat.format(Date(this))
+    }
+
+    fun Int.secToFormattedDate(dateFormat: String): String {
+        return (this * 1000L).millisToFormattedDate(dateFormat)
     }
 
     fun calculateDaysDiff(fromDateMillis: Long, toDateMillis: Long): Int {

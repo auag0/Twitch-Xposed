@@ -10,15 +10,21 @@ import android.text.method.LinkMovementMethod
 import android.text.style.BackgroundColorSpan
 import android.text.style.ClickableSpan
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.anago.twitchxposed.MainHook.Companion.modResource
 import com.anago.twitchxposed.R
+import com.anago.twitchxposed.database.AppDatabase.Companion.getDB
+import com.anago.twitchxposed.database.entity.UserChatMessage
 import com.anago.twitchxposed.hook.base.BaseHook
 import com.anago.twitchxposed.utils.DateUtils.calculateDaysDiff
-import com.anago.twitchxposed.utils.DateUtils.toFormattedDate
+import com.anago.twitchxposed.utils.DateUtils.millisToFormattedDate
+import com.anago.twitchxposed.utils.DateUtils.secToFormattedDate
 import com.anago.twitchxposed.utils.StringUtils.textCopy
 import com.anago.twitchxposed.utils.UrlUtils.openWebPage
 import com.anago.twitchxposed.utils.ViewUtils.layoutInflater
@@ -26,6 +32,11 @@ import com.anago.twitchxposed.utils.xposed.FieldUtils.getField
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ChatUserDialogViewDelegate(private val classLoader: ClassLoader) : BaseHook(classLoader) {
     private val clazz by lazy {
@@ -111,7 +122,7 @@ class ChatUserDialogViewDelegate(private val classLoader: ClassLoader) : BaseHoo
         val userId: Int = chatUser.getField("userId")
         val displayName: String = chatUser.getField("displayName")
         val username: String = chatUser.getField("username")
-        val formattedDate = createDateMillis.toFormattedDate("yyyy-MM-dd")
+        val formattedDate = createDateMillis.millisToFormattedDate("yyyy-MM-dd")
         val daysAgo = "${calculateDaysDiff(createDateMillis, System.currentTimeMillis())} days ago"
 
         val linearLayout = LinearLayout(context).apply {
@@ -137,11 +148,73 @@ class ChatUserDialogViewDelegate(private val classLoader: ClassLoader) : BaseHoo
             ) {
                 openWebPage(context, "https://twitchlogger.pl/tracker/${username}")
             })
+
+            addView(createDetailItem(
+                context, this, R.drawable.ic_chat, "Chat Logs", null
+            ) {
+                showMessageLogsDialog(context, displayName, userId)
+            })
         }
 
         AlertDialog.Builder(context).apply {
             setTitle("$username(${displayName})")
             setView(linearLayout)
         }.show()
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun showMessageLogsDialog(context: Context, displayName: String, userId: Int) {
+        val recyclerView = RecyclerView(context).apply {
+            layoutManager = LinearLayoutManager(context)
+        }
+        val dialog = AlertDialog.Builder(context).apply {
+            setTitle("Message Logs")
+            setView(recyclerView)
+        }.show()
+
+        GlobalScope.launch(Dispatchers.IO) {
+            val messages = getDB().userChatMessageDao().getAllMessagesByUserId(userId)
+            withContext(Dispatchers.Main) {
+                dialog.setTitle("${messages.size} Message Logs")
+                recyclerView.adapter = MessageLogAdapter(context, messages)
+            }
+        }
+    }
+
+    private class MessageLogAdapter(
+        private val context: Context,
+        private val list: List<UserChatMessage>
+    ) :
+        RecyclerView.Adapter<MessageLogAdapter.ViewHolder>() {
+        class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            val name: TextView = itemView.findViewById(R.id.name)
+            val timestamp: TextView = itemView.findViewById(R.id.time)
+            val message: TextView = itemView.findViewById(R.id.message)
+        }
+
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int
+        ): ViewHolder {
+            val layoutId = modResource.getLayout(R.layout.dialog_message_item)
+            val view = context.layoutInflater.inflate(layoutId, parent, false)
+            return ViewHolder(view)
+        }
+
+        @SuppressLint("SetTextI18n")
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val item = list[position]
+            if (item.displayName == item.userName) {
+                holder.name.text = item.userName
+            } else {
+                holder.name.text = "${item.displayName}(${item.userName})"
+            }
+            holder.timestamp.text = item.timestamp.secToFormattedDate("MM/dd HH:mm:ss")
+            holder.message.text = item.message
+        }
+
+        override fun getItemCount(): Int {
+            return list.size
+        }
     }
 }

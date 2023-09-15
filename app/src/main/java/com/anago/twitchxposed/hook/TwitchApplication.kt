@@ -1,14 +1,16 @@
 package com.anago.twitchxposed.hook
 
 import android.app.Application
+import com.anago.twitchxposed.database.AppDatabase.Companion.setupDatabase
 import com.anago.twitchxposed.hook.base.BaseHook
 import com.anago.twitchxposed.hook.emote.EmoteManager
 import com.anago.twitchxposed.pref.PRefs.setupPrefs
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class TwitchApplication(private val classLoader: ClassLoader) : BaseHook(classLoader) {
@@ -19,14 +21,16 @@ class TwitchApplication(private val classLoader: ClassLoader) : BaseHook(classLo
         )
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun hook() {
         XposedBridge.hookAllMethods(clazz, "onCreate", object : XC_MethodHook() {
             override fun beforeHookedMethod(param: MethodHookParam) {
                 val application = param.thisObject as Application
                 setupPrefs(application)
+                setupDatabase(application)
             }
             override fun afterHookedMethod(param: MethodHookParam) {
-                CoroutineScope(Dispatchers.IO).launch {
+                GlobalScope.launch(Dispatchers.IO) {
                     EmoteManager.fetchEmotes()
                 }
             }

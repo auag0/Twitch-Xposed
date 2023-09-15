@@ -3,6 +3,7 @@
 - prevent messages from clear by moderator
 - supported betterttv emotes
 - view chat user details
+- user chat message logs
 # Supported Twitch Versions
 - Twitch 16.2.0 ([apkcombo](https://apkcombo.com/twitch/tv.twitch.android.app/download/phone-16.2.0-apk))
 - Twitch 16.1.0 ([apkcombo](https://apkcombo.com/twitch/tv.twitch.android.app/download/phone-16.1.0-apk))

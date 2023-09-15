@@ -6,6 +6,8 @@ import android.graphics.drawable.Drawable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import androidx.core.text.set
+import com.anago.twitchxposed.database.AppDatabase.Companion.getDB
+import com.anago.twitchxposed.database.entity.UserChatMessage
 import com.anago.twitchxposed.hook.base.BaseHook
 import com.anago.twitchxposed.hook.emote.EmoteManager
 import com.anago.twitchxposed.utils.Logger.logE
@@ -13,6 +15,10 @@ import com.anago.twitchxposed.utils.xposed.FieldUtils.getStaticField
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class MessageRecyclerItem(private val classLoader: ClassLoader) : BaseHook(classLoader) {
     private val clazz by lazy {
@@ -40,11 +46,37 @@ class MessageRecyclerItem(private val classLoader: ClassLoader) : BaseHook(class
         )
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun hook() {
         XposedBridge.hookAllConstructors(clazz, object : XC_MethodHook() {
             override fun beforeHookedMethod(param: MethodHookParam) {
                 val context = param.args[0] as Context
                 param.args[6] = addEmotes(context, param.args[6] as Spanned)
+            }
+
+            override fun afterHookedMethod(param: MethodHookParam) {
+                if (param.args.size != 16) {
+                    return
+                }
+                val messageId = param.args[1] as String
+                val userId = param.args[2] as Int
+                val username = param.args[3] as String
+                val displayName = param.args[4] as String
+                val messageTimestamp = param.args[5] as Int
+                val message = param.args[13] as String
+
+                GlobalScope.launch(Dispatchers.IO) {
+                    getDB().userChatMessageDao().insertMessage(
+                        UserChatMessage(
+                            messageId = messageId,
+                            userId = userId,
+                            userName = username,
+                            displayName = displayName,
+                            message = message,
+                            timestamp = messageTimestamp
+                        )
+                    )
+                }
             }
         })
     }
