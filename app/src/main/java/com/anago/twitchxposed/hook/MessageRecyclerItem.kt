@@ -108,7 +108,7 @@ class MessageRecyclerItem(private val classLoader: ClassLoader) : BaseHook(class
                     val start = matchResult.range.first
                     val end = matchResult.range.last + 1
                     builder[start, end] =
-                        createCenteredImageSpan(emote.getUrl(context), Color.TRANSPARENT)
+                        createCenteredImageSpan(emote.url, Color.TRANSPARENT)
                 }
             }
 

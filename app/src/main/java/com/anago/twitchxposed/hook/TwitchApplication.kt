@@ -31,7 +31,7 @@ class TwitchApplication(private val classLoader: ClassLoader) : BaseHook(classLo
             }
             override fun afterHookedMethod(param: MethodHookParam) {
                 GlobalScope.launch(Dispatchers.IO) {
-                    EmoteManager.fetchEmotes()
+                    EmoteManager.fetchAllEmotes()
                 }
             }
         })
