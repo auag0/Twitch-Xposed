@@ -53,6 +53,7 @@ class ChatUserDialogViewDelegate(private val classLoader: ClassLoader) : BaseHoo
                 val chatUser = param.args[2]
                 val usernameText = param.thisObject.getField<TextView>("usernameText")
 
+                usernameText.isSingleLine = false
                 val origText = usernameText.text
                 val detailText = "[ Detail ]"
                 val newText = "$origText$detailText"
