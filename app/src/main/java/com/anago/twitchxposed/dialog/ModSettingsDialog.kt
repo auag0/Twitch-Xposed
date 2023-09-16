@@ -53,31 +53,35 @@ class ModSettingsDialog(private val context: Context) {
             )
         )
 
-        settingsLayout.addView(createItem(
-            "Auto Claim Points",
-            R.drawable.ic_currency_exchange,
-            "claim bonus points automatically",
-            useSwitch = true,
-            isCheckedd = enableAutoClaimPoints,
-            onClick = null,
-            onCheck = { isChecked ->
-                enableAutoClaimPoints = isChecked
-            },
-            isHeader = false
-        ))
+        settingsLayout.addView(
+            createItem(
+                "Auto Claim Points",
+                R.drawable.ic_currency_exchange,
+                "claim bonus points automatically",
+                useSwitch = true,
+                isCheckedd = enableAutoClaimPoints,
+                onClick = null,
+                onCheck = { isChecked ->
+                    enableAutoClaimPoints = isChecked
+                },
+                isHeader = false
+            )
+        )
 
-        settingsLayout.addView(createItem(
-            "Prevent Messages",
-            R.drawable.ic_contract_delete,
-            "prevent messages from clear by moderator",
-            useSwitch = true,
-            isCheckedd = enablePreventMessages,
-            onClick = null,
-            onCheck = { isChecked ->
-                enablePreventMessages = isChecked
-            },
-            isHeader = false
-        ))
+        settingsLayout.addView(
+            createItem(
+                "Prevent Messages",
+                R.drawable.ic_contract_delete,
+                "prevent messages from clear by moderator",
+                useSwitch = true,
+                isCheckedd = enablePreventMessages,
+                onClick = null,
+                onCheck = { isChecked ->
+                    enablePreventMessages = isChecked
+                },
+                isHeader = false
+            )
+        )
 
         settingsLayout.addView(
             createItem(
