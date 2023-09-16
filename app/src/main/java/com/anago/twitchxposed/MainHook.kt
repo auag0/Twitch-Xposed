@@ -1,6 +1,7 @@
 package com.anago.twitchxposed
 
 import android.content.res.XModuleResources
+import com.anago.twitchxposed.hook.EmoteCardViewDelegate
 import com.anago.twitchxposed.hook.ChatUserDialogViewDelegate
 import com.anago.twitchxposed.hook.ChatUtil
 import com.anago.twitchxposed.hook.CommunityPointsButtonViewDelegate
@@ -46,5 +47,6 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, IXposedHookInitP
         SettingsMenuViewDelegate(classLoader).hook()
         ChatUserDialogViewDelegate(classLoader).hook()
         NewProfileCardViewDelegate(classLoader).hook()
+        EmoteCardViewDelegate(classLoader).hook()
     }
 }
